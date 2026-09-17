@@ -1,0 +1,314 @@
+
+<!DOCTYPE html>
+
+<html lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
+<title>달걀 6개, 오일 6개</title>
+<meta content="달걀 6개와 오일 6개로 만드는 인터랙티브 스크롤 기사" name="description"/>
+<style>
+:root{--ink:#141619;--paper:#f6f1e8;--card:#fffefb;--line:#dfd8cc;--yolk:#f7ab00;--bad:#b3362f;--good:#316b55;--muted:#6d706f;--shadow:0 20px 60px rgba(20,18,15,.16);--max:1180px}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;background:var(--paper)}
+body{margin:0;color:var(--ink);background:var(--paper);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Arial,sans-serif;line-height:1.65}
+img{max-width:100%;display:block}
+button{font:inherit}
+a{color:inherit}
+.progress{position:fixed;z-index:1000;left:0;top:0;width:100%;height:4px;background:rgba(255,255,255,.5)}
+.progress i{display:block;width:0;height:100%;background:var(--yolk)}
+.hero{min-height:100svh;position:relative;display:grid;place-items:center;overflow:hidden;background:#101214;color:white}
+.hero-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.72) saturate(.9)}
+.hero:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.08),rgba(0,0,0,.78))}
+.hero-copy{position:relative;z-index:2;width:min(calc(100% - 36px),var(--max));padding:100px 0 70px;align-self:end}
+.eyebrow{display:inline-block;padding:7px 11px;border:1px solid rgba(255,255,255,.3);border-radius:999px;font-size:12px;font-weight:800;letter-spacing:.08em;background:rgba(0,0,0,.18)}
+.hero h1{font-size:clamp(46px,8vw,104px);line-height:.93;letter-spacing:-.06em;margin:18px 0 22px;max-width:980px}
+.hero p{max-width:720px;font-size:clamp(18px,2.1vw,25px);margin:0;color:rgba(255,255,255,.9)}
+.intro{padding:100px 20px}
+.intro-inner{max-width:760px;margin:auto;font-size:clamp(18px,2vw,22px)}
+.intro-inner p{margin:0 0 1.45em}
+.question{font-size:clamp(34px,5vw,66px);font-weight:900;line-height:1.06;letter-spacing:-.045em;margin:80px auto;max-width:980px;text-align:center}
+.scrolly{position:relative}
+.sticky{position:sticky;top:0;height:100svh;overflow:hidden;background:#111417}
+.stage{position:absolute;inset:0}
+.stage img{width:100%;height:100%;object-fit:cover;transition:opacity .35s ease,transform .5s ease}
+.stage .shade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,0,0,.1),rgba(0,0,0,.35))}
+.steps{position:relative;z-index:5;width:min(calc(100% - 28px),900px);margin:0 auto;padding:20vh 0 25vh}
+.step-card{width:min(520px,92%);margin:0 0 75vh auto;background:rgba(255,255,255,.96);border:1px solid rgba(0,0,0,.08);border-radius:22px;padding:24px 25px;box-shadow:var(--shadow);backdrop-filter:blur(10px)}
+.step-card.left{margin-left:0;margin-right:auto}
+.step-card.center{margin-left:auto;margin-right:auto}
+.step-card:last-child{margin-bottom:5vh}
+.step-card .n{font-size:11px;letter-spacing:.08em;font-weight:900;color:#8a7f6a}
+.step-card h2{font-size:clamp(26px,3.2vw,42px);line-height:1.07;letter-spacing:-.035em;margin:8px 0 12px}
+.step-card p{font-size:16px;color:#4f5457;margin:0}
+.step-card b{color:var(--bad)}
+.experiment-wrap{background:#15181b;color:#fff;padding:95px 20px}
+.experiment{width:min(100%,var(--max));margin:auto}
+.experiment-head{display:grid;grid-template-columns:1.15fr .85fr;gap:28px;align-items:end;margin-bottom:30px}
+.experiment-head h2{font-size:clamp(40px,6vw,76px);line-height:.98;letter-spacing:-.05em;margin:0}
+.experiment-head p{color:#b9c0c6;margin:0}
+.lab{border:1px solid rgba(255,255,255,.12);background:#1d2125;border-radius:30px;padding:clamp(18px,3vw,32px);box-shadow:var(--shadow)}
+.lab-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.panel{border:1px solid rgba(255,255,255,.11);border-radius:22px;padding:20px;background:#171a1d;min-height:440px}
+.panel h3{font-size:18px;margin:0 0 14px}
+.egg-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.egg-btn{position:relative;border:1px solid rgba(255,255,255,.1);border-radius:18px;background:#23282d;cursor:pointer;padding:12px;min-height:160px;overflow:hidden}
+.egg-btn img{width:100%;height:120px;object-fit:contain;filter:drop-shadow(0 12px 18px rgba(0,0,0,.25))}
+.egg-btn span{position:absolute;left:10px;bottom:8px;font-size:12px;color:#cbd1d5}
+.egg-btn[aria-pressed="true"]{outline:3px solid var(--yolk);background:#2a2b24}
+.oil-scene{position:relative;border-radius:18px;overflow:hidden;background:#080a0b;min-height:330px}
+.oil-scene img{width:100%;height:330px;object-fit:cover}
+.oil-hotspots{position:absolute;inset:0;display:grid;grid-template-columns:repeat(6,1fr)}
+.oil-hit{border:0;background:transparent;cursor:pointer;position:relative}
+.oil-hit span{position:absolute;left:50%;bottom:8px;transform:translateX(-50%);background:rgba(0,0,0,.72);padding:5px 7px;border-radius:8px;font-size:10px;color:#fff;white-space:nowrap}
+.oil-hit[aria-pressed="true"]{box-shadow:inset 0 0 0 4px var(--yolk)}
+.selection{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;color:#bac2c8;font-size:13px}
+.selection strong{color:white}
+.fry-box{margin-top:18px;display:grid;grid-template-columns:1fr 340px;gap:18px}
+.pan{position:relative;border-radius:22px;overflow:hidden;background:#d9d9d9;min-height:470px}
+.pan img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.pan .fried{opacity:0;transform:scale(.84);transition:opacity .7s ease,transform .8s cubic-bezier(.2,.8,.2,1)}
+.pan.cooking .fried{opacity:1;transform:scale(1)}
+.pan.cooking .raw{opacity:0}
+.sizzle{position:absolute;inset:0;pointer-events:none;opacity:0}
+.pan.cooking .sizzle{opacity:1}
+.sizzle i{position:absolute;width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.75);animation:pop 1.2s infinite}
+.sizzle i:nth-child(1){left:34%;top:48%;animation-delay:.1s}.sizzle i:nth-child(2){left:57%;top:57%;animation-delay:.35s}.sizzle i:nth-child(3){left:46%;top:38%;animation-delay:.7s}.sizzle i:nth-child(4){left:67%;top:46%;animation-delay:.55s}.sizzle i:nth-child(5){left:30%;top:62%;animation-delay:.9s}
+@keyframes pop{0%,100%{transform:scale(.2);opacity:.15}50%{transform:scale(1.9);opacity:.8}}
+.result{border:1px solid rgba(255,255,255,.11);border-radius:22px;padding:22px;background:#171a1d;display:flex;flex-direction:column;justify-content:space-between}
+.result small{color:#9aa3aa}
+.result h3{font-size:32px;line-height:1.05;margin:10px 0}
+.result p{color:#c1c8cd;font-size:14px}
+.meter{margin-top:18px}
+.meter-line{height:10px;background:#333a40;border-radius:999px;overflow:hidden;margin-top:8px}
+.meter-line i{display:block;height:100%;width:0;background:var(--yolk);border-radius:inherit;transition:width .5s ease}
+.fry-btn{width:100%;margin-top:18px;padding:15px 18px;border:0;border-radius:14px;background:var(--yolk);color:#111;font-weight:900;cursor:pointer}
+.fry-btn:disabled{opacity:.35;cursor:not-allowed}
+.reset{margin-top:10px;width:100%;padding:12px;border:1px solid rgba(255,255,255,.18);border-radius:12px;background:transparent;color:white;cursor:pointer}
+.evidence{padding:110px 20px;background:#fffdf8}
+.evidence-inner{max-width:980px;margin:auto}
+.evidence h2{font-size:clamp(38px,5vw,64px);line-height:1;letter-spacing:-.04em;margin:0 0 35px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.stat{border:1px solid var(--line);border-radius:22px;padding:24px;background:#fff}
+.stat strong{font-size:clamp(38px,5vw,62px);line-height:1;display:block}
+.stat span{font-size:13px;color:var(--muted);display:block;margin-top:10px}
+.final{padding:100px 20px;background:#efe7d8}
+.final-inner{width:min(100%,var(--max));margin:auto;display:grid;grid-template-columns:1.1fr .9fr;gap:30px;align-items:center}
+.final img{border-radius:26px;box-shadow:var(--shadow)}
+.final h2{font-size:clamp(38px,5vw,62px);line-height:1.03;letter-spacing:-.04em;margin:0 0 18px}
+.final p{color:#555c59;font-size:17px}
+.sources{padding:60px 20px 80px;background:#fffdf8}
+.sources-inner{max-width:900px;margin:auto;font-size:13px;color:#61676b}
+.sources h3{color:#111;font-size:18px}
+.sources ol{padding-left:20px}
+.sources li{margin:8px 0}
+@media(max-width:900px){
+  .experiment-head,.lab-grid,.fry-box,.final-inner{grid-template-columns:1fr}
+  .stats{grid-template-columns:1fr}
+  .panel{min-height:auto}
+  .step-card{margin-left:auto;margin-right:auto}
+  .oil-hit span{display:none}
+}
+@media(max-width:560px){
+  .egg-grid{grid-template-columns:repeat(2,1fr)}
+  .steps{padding-top:15vh}
+  .step-card{margin-bottom:68vh;padding:20px}
+  .experiment-wrap{padding-left:12px;padding-right:12px}
+  .lab{padding:12px}
+}
+
+/* automatic egg + oil scrollytelling; original hero/intro styles above are unchanged */
+.pair-wrap{background:#15181b;color:#fff;padding:0 0 10vh}
+.pair-title{width:min(calc(100% - 40px),var(--max));margin:0 auto;padding:85px 0 28px}
+.pair-title h2{font-size:clamp(40px,6vw,76px);line-height:.98;letter-spacing:-.05em;margin:0}
+.pair-scroll{position:relative;height:650svh;background:#111417}
+.pair-sticky{position:sticky;top:0;height:100svh;overflow:hidden;background:radial-gradient(circle at 50% 62%,#403421 0,#191b1d 48%,#0d0f11 100%)}
+.pair-count{position:absolute;right:5vw;top:6vh;z-index:20;color:var(--yolk);font-weight:900;letter-spacing:.08em}
+.pair-pan{position:absolute;left:50%;bottom:-7vh;transform:translateX(-50%);width:min(940px,94vw);height:52vh;border-radius:50% 50% 0 0;overflow:hidden;background:#090909;box-shadow:0 -20px 80px rgba(0,0,0,.6);z-index:1}
+.pair-pan img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 55%;filter:brightness(.34) saturate(.55);transform:scale(1.03);transition:filter .9s ease,transform 1.2s ease,opacity .55s ease}
+.pair-stage.cooking .pair-pan img{filter:brightness(1) saturate(1.08);transform:scale(1.09)}
+.pair-egg{position:absolute;top:38%;width:min(180px,18vw);z-index:8;opacity:0;filter:drop-shadow(0 18px 16px rgba(0,0,0,.36));will-change:transform,left,right}
+.pair-oil{position:absolute;top:18%;height:min(46vh,430px);width:auto;z-index:7;opacity:0;filter:drop-shadow(0 20px 20px rgba(0,0,0,.35));will-change:transform,left,right}
+.pair-stage.odd .pair-oil{left:-24vw}.pair-stage.odd .pair-egg{right:-24vw}
+.pair-stage.even .pair-oil{right:-24vw}.pair-stage.even .pair-egg{left:-24vw}
+.pair-stage.run.odd .pair-oil{animation:oilFromLeft 1.65s cubic-bezier(.15,.72,.2,1) forwards}
+.pair-stage.run.even .pair-oil{animation:oilFromRight 1.65s cubic-bezier(.15,.72,.2,1) forwards}
+.pair-stage.run.odd .pair-egg{animation:eggRollFromRight 2.05s cubic-bezier(.16,.72,.22,1) forwards}
+.pair-stage.run.even .pair-egg{animation:eggRollFromLeft 2.05s cubic-bezier(.16,.72,.22,1) forwards}
+@keyframes oilFromLeft{0%{left:-24vw;opacity:0;transform:rotate(-8deg) translateY(6vh)}100%{left:27%;opacity:1;transform:rotate(5deg) translateY(0)}}
+@keyframes oilFromRight{0%{right:-24vw;opacity:0;transform:rotate(8deg) translateY(6vh)}100%{right:27%;opacity:1;transform:rotate(-5deg) translateY(0)}}
+@keyframes eggRollFromRight{
+  0%{right:-24vw;opacity:0;transform:translateY(0) rotate(0deg)}
+  10%{opacity:1}
+  25%{transform:translateY(-6px) rotate(-360deg)}
+  50%{transform:translateY(3px) rotate(-780deg)}
+  75%{transform:translateY(-4px) rotate(-1140deg)}
+  100%{right:37%;opacity:1;transform:translateY(0) rotate(-1440deg)}
+}
+@keyframes eggRollFromLeft{
+  0%{left:-24vw;opacity:0;transform:translateY(0) rotate(0deg)}
+  10%{opacity:1}
+  25%{transform:translateY(-6px) rotate(360deg)}
+  50%{transform:translateY(3px) rotate(780deg)}
+  75%{transform:translateY(-4px) rotate(1140deg)}
+  100%{left:37%;opacity:1;transform:translateY(0) rotate(1440deg)}
+}
+.pair-stream{position:absolute;left:50%;top:48%;width:9px;height:0;z-index:12;opacity:0;transform:translateX(-50%);border-radius:999px;background:linear-gradient(90deg,#a8661b,#ffd874,#a8661b);box-shadow:0 0 14px rgba(255,196,72,.55)}
+.pair-stage.pouring .pair-stream{animation:oilPour 1.2s ease forwards}
+@keyframes oilPour{0%{height:0;opacity:0}18%{opacity:1}68%{height:20vh;opacity:1}100%{height:0;opacity:0}}
+.pair-stage.cracking .pair-egg{animation:none!important;opacity:0}
+.pair-result{position:absolute;z-index:18;right:5vw;top:20vh;width:min(390px,36vw);padding:22px 24px;border-radius:20px;background:rgba(255,255,255,.95);color:#17191b;box-shadow:0 22px 70px rgba(0,0,0,.3);opacity:0;transform:translateY(22px);transition:opacity .5s ease,transform .5s ease}
+.pair-stage.result .pair-result{opacity:1;transform:none}
+.pair-result small{font-size:11px;font-weight:900;letter-spacing:.1em;color:#8a7f6a}
+.pair-result h3{font-size:clamp(26px,3vw,38px);line-height:1.05;margin:8px 0 10px}
+.pair-result p{font-size:15px;line-height:1.65;color:#4f5457;margin:0}
+.pair-result strong{color:var(--bad)}
+.pair-step{height:100svh;pointer-events:none}
+@media(max-width:900px){
+  .pair-title{padding:70px 0 18px}
+  .pair-oil{height:31vh;top:26%}
+  .pair-egg{width:25vw;top:42%}
+  .pair-pan{width:112vw;height:39vh;bottom:0}
+  .pair-result{top:auto;right:5vw;left:5vw;bottom:4vh;width:auto;padding:17px 18px}
+  .pair-stage.run.odd .pair-oil{animation-name:oilFromLeftM}
+  .pair-stage.run.even .pair-oil{animation-name:oilFromRightM}
+  .pair-stage.run.odd .pair-egg{animation-name:eggRollFromRightM}
+  .pair-stage.run.even .pair-egg{animation-name:eggRollFromLeftM}
+  @keyframes oilFromLeftM{0%{left:-38vw;opacity:0;transform:rotate(-8deg)}100%{left:15%;opacity:1;transform:rotate(5deg)}}
+  @keyframes oilFromRightM{0%{right:-38vw;opacity:0;transform:rotate(8deg)}100%{right:15%;opacity:1;transform:rotate(-5deg)}}
+  @keyframes eggRollFromRightM{0%{right:-34vw;opacity:0;transform:rotate(0)}10%{opacity:1}45%{transform:translateY(-4px) rotate(-720deg)}100%{right:24%;opacity:1;transform:translateY(0) rotate(-1440deg)}}
+  @keyframes eggRollFromLeftM{0%{left:-34vw;opacity:0;transform:rotate(0)}10%{opacity:1}45%{transform:translateY(-4px) rotate(720deg)}100%{left:24%;opacity:1;transform:translateY(0) rotate(1440deg)}}
+}
+
+
+.pair-title p{max-width:760px;margin:18px 0 0;color:#c7cdd1;font-size:clamp(16px,1.8vw,21px);line-height:1.75}.final-inner>div>p{font-size:clamp(17px,1.8vw,21px);line-height:1.9;margin:0}
+</style>
+</head>
+<body>
+<div class="progress"><i id="progressBar"></i></div>
+<section class="hero">
+<img alt="프라이팬에 달걀을 깨는 모습" class="hero-bg" src="assets/crack-egg.png"/>
+<div class="hero-copy">
+<span class="eyebrow">INTERACTIVE HEALTH STORY</span>
+<h1>달걀 6개.<br/>오일 6개.</h1>
+<p>같은 달걀 프라이도 어떤 기름을 반복해서 쓰느냐에 따라 지방의 구성이 달라집니다. 직접 하나씩 골라 부쳐보세요.</p>
+</div>
+</section>
+<section class="intro">
+<div class="intro-inner"><p>여러분은 달걀 프라이를 좋아하시나요?</p><p>아침으로 달걀 두 알. 든든하고 맛이 있죠. 그런데 몰랐던 사실을 최근에 알았습니다.</p><p>건강에 좋다고 알려져 많은 사람들이 쓰고 있는 '이 기름'이 오히려 달걀 프라이를 할 때 사용하면 심혈관을 해칠 수 있다는 건데요.</p></div>
+<div class="question">어떻게 된 일일까요?</div>
+</section>
+
+<section class="pair-wrap">
+<div class="pair-title"><h2>6 EGGS / 6 OILS</h2><p>집에 있는 6개의 달걀과 6종류의 오일을 활용해서 달걀 프라이를 만들어 '최악의 달걀 프라이'를 찾아보겠습니다.</p></div>
+<div class="pair-scroll">
+<div class="pair-sticky pair-stage odd" id="pairStage">
+<div class="pair-count" id="pairCount">01 / 06</div>
+<div class="pair-pan"><img alt="달걀 프라이" id="pairPanImg" src="assets/egg-sunny.png"/></div>
+<img alt="올리브오일" class="pair-oil" id="pairOil" src="assets/oil-olive.png"/>
+<img alt="달걀" class="pair-egg" src="assets/rolling-egg.png"/>
+<i aria-hidden="true" class="pair-stream"></i>
+<aside class="pair-result" id="pairResult">
+<small id="pairKicker">01 / 06</small>
+<h3 id="pairName">올리브오일</h3>
+<p id="pairText">불포화지방을 섭취하는 대표적인 선택지로 알려져 있습니다.</p>
+</aside>
+</div>
+<div class="pair-step" data-pair="0"></div>
+<div class="pair-step" data-pair="1"></div>
+<div class="pair-step" data-pair="2"></div>
+<div class="pair-step" data-pair="3"></div>
+<div class="pair-step" data-pair="4"></div>
+<div class="pair-step" data-pair="5"></div>
+</div>
+</section><section class="scrolly" id="story">
+<div class="sticky">
+<div class="stage">
+<img alt="" id="storyImage" src="assets/egg-sunny.png"/>
+<div class="shade"></div>
+</div>
+</div>
+<div class="steps"><article class="step-card left" data-image="assets/coconut-oil-egg.png"><span class="n">01 / COCONUT OIL</span><h2>코코넛오일</h2><p>미 건강 전문 매체 '퍼레이드'는 16일(현지시간) 심장 전문의와 진행한 인터뷰를 통해 달걀 프라이를 부칠 때 '코코넛오일'을 식용유로 사용할 경우 심혈관을 해칠 수 있다고 경고 했습니다.</p><p>코코넛오일은 원래 건강식품으로 알려졌으나, 조리용으로는 오히려 콜레스테롤을 끌어 올릴 위험이 있다는 건데요.</p></article><article class="step-card" data-image="assets/coconut-oil-egg.png"><span class="n">02 / EXPERT</span><h2>전문의 설명</h2><p>미국 의료기기 전문 제조업체 '애보트'에서 혈관사업부 최고의학책임자를 맡은 닉 웨스트 심장내과 전문의 박사는 달걀을 부칠 때 코코넛오일이나 팜유를 권하지 않는다고 강조했습니다.</p></article><article class="step-card left" data-image="assets/artery.png"><span class="n">03 / SATURATED FAT · LDL</span><h2>80~90% 포화지방</h2><p>전문가 설명에 따르면 코코넛오일은 지방의 80~90%가 포화지방으로 이뤄진 기름입니다. 포화지방을 많이 섭취하면 'LDL 콜레스테롤'이 증가할 수 있습니다. 또 올리브오일과 달리 코코넛오일은 오랜 시간에 걸친 임상 연구에서 심장 보호 효과가 확인된 바 없는 것으로 전해졌습니다.</p></article><article class="step-card" data-image="assets/research-desk.png"><span class="n">04 / CIRCULATION · 2020</span><h2>730명을 분석했습니다</h2><p>관련 연구도 이를 뒷받침한다. 2020년 국제학술지 '서큘레이션'에는 싱가포르국립대 연구팀의 임상시험 분석 결과가 실린 바 있습니다. 당시 연구팀은 730명의 자료를 분석, 코코넛오일 섭취군이 비열대성 식물성기름 섭취군보다 LDL 콜레스테롤이 훨씬 높게 나왔다고 밝힌 바 있습니다.</p></article><article class="step-card center" data-image="assets/oils.png"><span class="n">05 / WHICH OIL?</span><h2>그렇다면 어떤 기름을?</h2><p>그렇다면 달걀 프라이를 만들 때는 어떤 기름을 사용해야 할까요.</p><p>스리하리 나이두 미 뉴욕의과대 교수 겸 심장내과 전문의는 같은 매체와의 인터뷰에서 "전문의로서는 카놀라유, 해바라기유, 홍화씨유를 권한다"고 밝혔습니다. 엑스트라 올리브오일, 아보카도오일도 LDL 콜레스테롤을 낮추는 데 도움이 되는 것으로 알려졌습니다.</p></article></div>
+</section>
+
+<section class="final">
+<div class="final-inner">
+<img alt="과일과 요구르트, 달걀이 놓인 균형 잡힌 아침식사" src="assets/balanced-breakfast.png"/>
+<div><p>다만 기름 종류를 바꾸는 것만으로는 콜레스테롤 위험에서 완전히 벗어날 수 없습니다. 웨스트 박사는 기름에 부친 달걀 요리를 매일 먹는 대신, 베리류나 사과, 파인애플과 저지방 요구르트, 그래놀라 등을 곁들인 아침 식사로 영양의 균형을 맞추는 게 낫다고 권고했습니다. 특정 건강식품을 과잉 섭취하는 것보다 포화지방 섭취를 전체적으로 줄이고, 불포화지방을 적당량 복용하는 습관이 건강에 더 이롭다는 설명입니다.</p></div>
+</div>
+</section>
+<section class="sources">
+<div class="sources-inner">
+<h3>근거 및 참고</h3>
+<ol>
+<li>Parade, cardiologist interview on cooking oils for eggs.</li>
+<li>Neelakantan N, Seah JYH, van Dam RM. The Effect of Coconut Oil Consumption on Cardiovascular Risk Factors. Circulation. 2020;141:803-814.</li>
+<li>American Heart Association guidance on saturated fats and healthy cooking oils.</li>
+</ol>
+</div>
+</section>
+<script>
+const storyCards=[...document.querySelectorAll(".step-card")];
+const storyImage=document.getElementById("storyImage");
+const storyObserver=new IntersectionObserver((entries)=>{
+  entries.forEach(entry=>{
+    if(entry.isIntersecting){
+      const src=entry.target.dataset.image;
+      storyImage.style.opacity=".25";
+      storyImage.style.transform="scale(1.035)";
+      setTimeout(()=>{storyImage.src=src;storyImage.style.opacity="1";storyImage.style.transform="scale(1)";},140);
+    }
+  });
+},{rootMargin:"-42% 0px -42% 0px",threshold:0});
+storyCards.forEach(c=>storyObserver.observe(c));
+
+const pairData=[
+  {name:"올리브오일",oil:"assets/oil-olive.png",fry:"assets/egg-sunny.png",text:"달걀 프라이 완성"},
+  {name:"카놀라유",oil:"assets/oil-canola.png",fry:"assets/egg-runny.png",text:"달걀 프라이 완성"},
+  {name:"해바라기유",oil:"assets/oil-sunflower.png",fry:"assets/egg-bubbling.png",text:"달걀 프라이 완성"},
+  {name:"홍화씨유",oil:"assets/oil-safflower.png",fry:"assets/egg-sunny.png",text:"달걀 프라이 완성"},
+  {name:"팜유",oil:"assets/oil-palm.png",fry:"assets/egg-crisp.png",text:"달걀 프라이 완성"},
+  {name:"코코넛오일",oil:"assets/oil-coconut.png",fry:"assets/coconut-oil-egg.png",text:"달걀 프라이 완성"}
+];
+const pairStage=document.getElementById("pairStage");
+const pairOil=document.getElementById("pairOil");
+const pairPanImg=document.getElementById("pairPanImg");
+const pairCount=document.getElementById("pairCount");
+const pairKicker=document.getElementById("pairKicker");
+const pairName=document.getElementById("pairName");
+const pairText=document.getElementById("pairText");
+const pairSteps=[...document.querySelectorAll(".pair-step")];
+let pairTimers=[];
+function playPair(i){
+  const d=pairData[i];
+  pairTimers.forEach(clearTimeout);pairTimers=[];
+  pairStage.classList.remove("run","cracking","pouring","cooking","result","odd","even");
+  pairStage.classList.add(i%2===0?"odd":"even");
+  pairOil.src=d.oil;pairOil.alt=d.name;
+  pairPanImg.src=d.fry;
+  pairCount.textContent=String(i+1).padStart(2,"0")+" / 06";
+  pairKicker.textContent=String(i+1).padStart(2,"0")+" / 06";
+  pairName.textContent=d.name;
+  pairText.textContent=d.text;
+  void pairStage.offsetWidth;
+  pairStage.classList.add("run");
+  pairTimers.push(setTimeout(()=>pairStage.classList.add("cracking"),1900));
+  pairTimers.push(setTimeout(()=>{pairStage.classList.remove("cracking");pairStage.classList.add("pouring")},2250));
+  pairTimers.push(setTimeout(()=>pairStage.classList.add("cooking"),3050));
+  pairTimers.push(setTimeout(()=>pairStage.classList.add("result"),3850));
+}
+const pairObserver=new IntersectionObserver((entries)=>{
+  entries.forEach(entry=>{if(entry.isIntersecting)playPair(Number(entry.target.dataset.pair));});
+},{rootMargin:"-48% 0px -48% 0px",threshold:0});
+pairSteps.forEach(s=>pairObserver.observe(s));
+playPair(0);
+
+const pbar=document.getElementById("progressBar");
+function setProgress(){const max=document.documentElement.scrollHeight-innerHeight;pbar.style.width=(max>0?scrollY/max*100:0)+"%"}
+addEventListener("scroll",setProgress,{passive:true});setProgress();
+
+const reportHeight=()=>{if(window.parent!==window){window.parent.postMessage({type:"egg-oil-story-height",height:document.documentElement.scrollHeight},"*")}};
+new ResizeObserver(reportHeight).observe(document.documentElement);addEventListener("load",reportHeight);
+</script>
+</body>
+</html>
