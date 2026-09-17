@@ -363,16 +363,31 @@ function playPair(i){
   pairTimers.forEach(clearTimeout);pairTimers=[];
   pairStage.classList.remove("run","cracking","pouring","cooking","result","odd","even");
   pairStage.classList.add(i%2===0?"odd":"even");
-  pairOil.src=d.oil;pairOil.alt=d.name;
+
+  pairOil.src=d.oil;
+  pairOil.alt=d.name;
   pairPanImg.src=d.fry;
+
   pairCount.textContent=String(i+1).padStart(2,"0")+" / 06";
-  pairKicker.textContent=String(i+1).padStart(2,"0")+" / 06";
+  pairKicker.textContent=d.kicker;
   pairName.textContent=d.name;
-  pairText.textContent=d.text;
+  pairText.textContent=d.result;
+  pairNote.textContent=d.note;
+
+  pairOilLabel.textContent=d.name+" 1병";
+  pairMeetline.textContent=d.meet;
+
+  pairResult.classList.toggle("good",!!d.good);
+  pairResult.classList.toggle("bad",!d.good);
+
   void pairStage.offsetWidth;
   pairStage.classList.add("run");
+
   pairTimers.push(setTimeout(()=>pairStage.classList.add("cracking"),1900));
-  pairTimers.push(setTimeout(()=>{pairStage.classList.remove("cracking");pairStage.classList.add("pouring")},2250));
+  pairTimers.push(setTimeout(()=>{
+    pairStage.classList.remove("cracking");
+    pairStage.classList.add("pouring");
+  },2250));
   pairTimers.push(setTimeout(()=>pairStage.classList.add("cooking"),3050));
   pairTimers.push(setTimeout(()=>pairStage.classList.add("result"),3850));
 }
